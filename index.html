@@ -33,6 +33,18 @@
            padding: 1px 7px; font-size: 11px; font-weight: 700; }
   #hint { color: var(--text-dim); font-size: 11px; display: flex; gap: 10px; }
   #hint span { white-space: nowrap; }
+  #autoplay-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  #autoplay-btn {
+    background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent);
+    border-radius: 4px; padding: 2px 10px; font-size: 12px; cursor: pointer;
+    white-space: nowrap; transition: background .15s;
+  }
+  #autoplay-btn:hover { background: rgba(56,189,248,0.3); }
+  #autoplay-btn.playing { background: rgba(56,189,248,0.25); }
+  #interval-select {
+    background: var(--surface2); border: 1px solid rgba(56,189,248,0.3); color: var(--text);
+    border-radius: 4px; padding: 2px 6px; font-size: 12px; cursor: pointer;
+  }
   #body { display: flex; flex: 1; overflow: hidden; }
   #sidebar {
     width: var(--sidebar-w); flex-shrink: 0;
@@ -94,6 +106,16 @@
     <span>滾輪 縮放</span>
     <span>拖曳 平移</span>
     <span>雙擊 還原</span>
+  </div>
+  <div id="autoplay-controls">
+    <select id="interval-select">
+      <option value="5000">5 秒</option>
+      <option value="10000" selected>10 秒</option>
+      <option value="15000">15 秒</option>
+      <option value="20000">20 秒</option>
+      <option value="30000">30 秒</option>
+    </select>
+    <button id="autoplay-btn">&#9654; 自動播放</button>
   </div>
 </div>
 <div id="body">
@@ -355,6 +377,42 @@ mainImg.onload = fitImage;
 mainImg.src = GROUPS[0].images[0].file;
 headerPos.textContent = GROUPS[0].label + '  1 / ' + GROUPS[0].images.length;
 headerBadge.textContent = '1/' + GROUPS[0].images.length;
+
+// ── 自動播放 ──
+let autoTimer = null;
+const autoBtn = document.getElementById('autoplay-btn');
+const intervalSel = document.getElementById('interval-select');
+
+function autoNext() {
+  const grp = GROUPS[curGroup];
+  if (curIdx + 1 < grp.images.length) {
+    loadSlide(curIdx + 1);
+  } else if (curGroup + 1 < GROUPS.length) {
+    switchGroup(curGroup + 1);
+  } else {
+    switchGroup(0);
+  }
+}
+
+function startAuto() {
+  const ms = parseInt(intervalSel.value, 10);
+  autoTimer = setInterval(autoNext, ms);
+  autoBtn.textContent = '⏸ 自動播放';
+  autoBtn.classList.add('playing');
+}
+
+function stopAuto() {
+  clearInterval(autoTimer);
+  autoTimer = null;
+  autoBtn.textContent = '▶ 自動播放';
+  autoBtn.classList.remove('playing');
+}
+
+autoBtn.onclick = () => { autoTimer ? stopAuto() : startAuto(); };
+
+intervalSel.onchange = () => {
+  if (autoTimer) { stopAuto(); startAuto(); }
+};
 </script>
 </body>
 </html>

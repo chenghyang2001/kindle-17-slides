@@ -387,10 +387,8 @@ function autoNext() {
   const grp = GROUPS[curGroup];
   if (curIdx + 1 < grp.images.length) {
     loadSlide(curIdx + 1);
-  } else if (curGroup + 1 < GROUPS.length) {
-    switchGroup(curGroup + 1);
   } else {
-    switchGroup(0);
+    loadSlide(0);
   }
 }
 

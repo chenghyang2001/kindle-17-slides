@@ -41,7 +41,7 @@
   }
   #autoplay-btn:hover { background: rgba(56,189,248,0.3); }
   #autoplay-btn.playing { background: rgba(56,189,248,0.25); }
-  #interval-select {
+  #interval-select, #mode-select {
     background: var(--surface2); border: 1px solid rgba(56,189,248,0.3); color: var(--text);
     border-radius: 4px; padding: 2px 6px; font-size: 12px; cursor: pointer;
   }
@@ -114,6 +114,10 @@
       <option value="15000">15 秒</option>
       <option value="20000">20 秒</option>
       <option value="30000">30 秒</option>
+    </select>
+    <select id="mode-select" title="自動播放範圍">
+      <option value="chapter" selected>本章循環</option>
+      <option value="book">全書連播</option>
     </select>
     <button id="autoplay-btn">&#9654; 自動播放</button>
   </div>
@@ -382,11 +386,14 @@ headerBadge.textContent = '1/' + GROUPS[0].images.length;
 let autoTimer = null;
 const autoBtn = document.getElementById('autoplay-btn');
 const intervalSel = document.getElementById('interval-select');
+const modeSelect = document.getElementById('mode-select');
 
 function autoNext() {
   const grp = GROUPS[curGroup];
   if (curIdx + 1 < grp.images.length) {
     loadSlide(curIdx + 1);
+  } else if (modeSelect.value === 'book') {
+    switchGroup((curGroup + 1) % GROUPS.length);
   } else {
     loadSlide(0);
   }
